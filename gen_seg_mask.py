@@ -26,10 +26,15 @@ with open("noun_phrases.jsonl", "r") as f:
     for line in f:
         data = json.loads(line)
         noun_phrases.append(data["generated_text"])
+        
+if not os.path.exists("segmentation_masks"):
+    os.makedirs("segmentation_masks")
+max_idx = max([int(fn.split(".")[0]) for fn in os.listdir("segmentation_masks") if fn.endswith(".png")], default=-1)
+
 dataset = load_dataset("openbmb/RLAIF-V-Dataset", split="train")
 dataloader = DataLoader(dataset, batch_size=bsize, shuffle=False, collate_fn=collate_batch)
 for i, sample in tqdm(enumerate(dataloader), total=len(dataloader), desc="Processing Images"): 
-    if os.path.exists(f"segmentation_masks/{(i+1)*bsize}.png"):
+    if (i+1)*bsize < max_idx:
         continue
     inputs = processor(images=sample["image"], text=noun_phrases[i*bsize:(i+1)*bsize], return_tensors="pt").to(device)
     with torch.no_grad():
