@@ -29,6 +29,8 @@ with open("noun_phrases.jsonl", "r") as f:
 dataset = load_dataset("openbmb/RLAIF-V-Dataset", split="train")
 dataloader = DataLoader(dataset, batch_size=bsize, shuffle=False, collate_fn=collate_batch)
 for i, sample in tqdm(enumerate(dataloader), total=len(dataloader), desc="Processing Images"): 
+    if os.path.exists(f"segmentation_masks/{(i+1)*bsize}.png"):
+        continue
     inputs = processor(images=sample["image"], text=noun_phrases[i*bsize:(i+1)*bsize], return_tensors="pt").to(device)
     with torch.no_grad():
         outputs = model(**inputs)
