@@ -15,7 +15,7 @@ def collate_batch(samples):
         "image": [sample["image"] for sample in samples],
     }
 
-bsize = 32
+bsize = 24
 accelerator = Accelerator()
 device = accelerator.device
 model = Sam3Model.from_pretrained("facebook/sam3").to(device)
